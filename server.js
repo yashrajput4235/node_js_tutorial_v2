@@ -50,8 +50,8 @@ app.get('/',(req,res)=>{
     res.send("Hello Your Server Is Running.");
 });
 
-app.use('/',personRoutes);
-app.use('/',menuRoutes);
+app.use('/person',personRoutes);
+app.use('/menu',menuRoutes);
 
 
 // start the server and listen for incoming requests
