@@ -3,7 +3,7 @@ const router = express.Router();
 const MenuItem = require('./../models/Menu');
 
 // POST route to add a menu item
-router.post('/menu', async (req, res) => {
+router.post('/', async (req, res) => {
     try {
         const data = req.body;
         const newMenu = new MenuItem(data);
@@ -17,7 +17,7 @@ router.post('/menu', async (req, res) => {
 });
 
 // GET route to fetch all menu items
-router.get('/menu', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const data = await MenuItem.find();
         console.log("menu data fetched");
@@ -29,7 +29,7 @@ router.get('/menu', async (req, res) => {
 });
 
 // Parameterized GET route for category
-router.get('/menu/:categoryType', async (req, res) => {
+router.get('/:categoryType', async (req, res) => {
     try {
         const categoryType = req.params.categoryType;
         if (['breakfast', 'lunch', 'dinner', 'snack'].includes(categoryType)) {

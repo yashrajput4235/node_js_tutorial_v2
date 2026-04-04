@@ -40,13 +40,19 @@ const Person=require('./models/Person');
 const MenuItem=require('./models/Menu');  
 const personRoutes=require('./routes/personRoutes'); 
 const menuRoutes=require('./routes/menuRoutes'); 
-// app.use('/menu',MenuItem); // Removed as it was wrong and redundant with routes below
+const passport = require('./auth');
 
-// define a port number(e.g. 3001)
-const PORT=3001;
+// middleware function
+const logRequest = (req, res, next) => {
+    console.log(`[${new Date().toISOString()}] Request Method: ${req.method}, URL: ${req.url}`);
+    next(); 
+};
 
+app.use(passport.initialize());
+
+const PORT = 3001;
 //DEFINE A simple route for the root URL('/')
-app.get('/',(req,res)=>{
+app.get('/',passport.authenticate('local',{session:false}),logRequest,(req,res)=>{
     res.send("Hello Your Server Is Running.");
 });
 

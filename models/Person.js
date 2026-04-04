@@ -1,4 +1,5 @@
 const mongoose=require("mongoose");
+const bcrypt=require("bcrypt");
 
 // cretate a databse schema here
 
@@ -34,9 +35,32 @@ const personSchema=new mongoose.Schema({
     salary:{
         type: Number,
         required:true   // ❌ 'require' → 'required'
+    },
+    username:{
+        type: String,
+        required:true,
+        unique:true
+    },
+    password:{
+        type: String,
+        required:true
     }
     
 });
+personSchema.pre('save',async function(next){
+    const person=this;
+    if(!person.isModified('password')) return next();
+    try{
+        const salt=await bcrypt.genSalt(10);
+        person.password=await bcrypt.hash(person.password,salt);
+        next();
+    }catch(err){
+        next(err);
+    }
+});
+personSchema.methods.comparePassword=async function(password){
+    return bcrypt.compare(password,this.password);
+}
 
 // on the basis of person schema create a model here we do all the crud command
 const Person=mongoose.model('Person',personSchema);
