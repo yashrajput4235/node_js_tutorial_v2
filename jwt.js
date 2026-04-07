@@ -24,4 +24,4 @@ const generateToken=(userData)=>{
     // genreate jwt token
     return jwt.sign(userData,process.env.JWT_SECRET,{expiresIn:30000});
 }
-module.exports={jwtAuthMiddleware,generateToken};
+module.exports={jwtAuthMiddleware,generateToken};   
