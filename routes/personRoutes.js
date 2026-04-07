@@ -1,7 +1,7 @@
 const express=require('express');
 const router=express.Router();
 const Person=require('./../models/Person');
-
+const {jwtAuthMiddleware,generateToken}=require('./../jwt');
 router.post('/',async (req,res)=>{
     try{
         const data=req.body// assigning the request body conatin the prerson data
@@ -11,7 +11,13 @@ router.post('/',async (req,res)=>{
         // save the new person document to the database
         const response = await newPerson.save();
         console.log("person saved successfully");
-        res.status(200).json(response);
+        // generate token
+        const payload={
+            id:response.id,
+            username:response.username
+        }
+        const token=genrateToken(payload);
+        res.status(200).json({response:response,token:token});
     }
     catch(err){
         console.log("error saving person",err);
@@ -19,7 +25,7 @@ router.post('/',async (req,res)=>{
     }
 })
 // get method is used to get the person data
-router.get('/',async(req,res)=>{
+router.get('/',jwtAuthMiddleware,async(req,res)=>{
     try{
         const data=await Person.find();
         console.log("person data fetched successfully");
@@ -84,6 +90,30 @@ router.delete('/:id',async(req,res)=>{
         res.status(500).json({error:'internal server error'});
     }
 });
+// login route
+router.post('/login',async(req,res)=>{
+    try{
+        const {username,password}=req.body;
+        const user=await Person.findOne({username:username});
+        if(!user){
+            return res.status(404).json({error:'person not found'});
+        }
+        const isMatch=await user.comparePassword(password);
+        if(!isMatch){
+            return res.status(401).json({error:'invalid password'});
+        }
+        const payload={
+            id:user.id,
+            username:user.username
+        }
+        const token=genrateToken(payload);
+        res.status(200).json({response:user,token:token});
+    }
+    catch(err){
+        console.log("error logging in",err);
+        res.status(500).json({error:'internal server error'});
+    }
+}); 
 
 module.exports=router;
 
